@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 88
+target-version = ['py313']
+
+[tool.isort]
+profile = "black"
+
+[tool.autoflake]
+check_diff = "True"
+imports = ["sqlalchemy", "app"]
+
+[tool.pyright]
+include = ["app"]

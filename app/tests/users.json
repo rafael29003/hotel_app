@@ -1,0 +1,48 @@
+[
+    {
+      "email": "fedor@moloko.ru",
+      "hashed_password": "$2b$12$X5RFCVjTciHpqlACi0C/L.wDs7dqKqB5dR3EoNz7C27XOPT45/sRK"
+    },
+    {
+      "email": "sharik@moloko.ru",
+      "hashed_password": "$2b$12$qHk7HpfV.Uod/FUgSID14.VdSp/CPTE3oNOuiAt2Q6eGNn6R2z6eC"
+    },
+    {
+      "email": "fedor2@moloko.ru",
+      "hashed_password": "$2b$12$X5RFCVjTciHpqlACi0C/L.wDs7dqKqB5dR3EoNz7C27XOPT45/sRK"
+    },
+    {
+      "email": "sharik2@moloko.ru",
+      "hashed_password": "$2b$12$qHk7HpfV.Uod/FUgSID14.VdSp/CPTE3oNOuiAt2Q6eGNn6R2z6eC"
+    },
+    {
+      "email": "user@example.com",
+      "hashed_password": "$2b$12$smRSj1YPmiJ7eMncCxABNO26A8IgZAZ3sDFKnawVDgDD./UZRSJbu"
+    },
+    {
+      "email": "new@mail.com",
+      "hashed_password": "$2b$12$FRumt8pUeaZpG7F1fbJrPOar6tMaPeDMbzfxHwKp2JdzDtUvyr4xG"
+    },
+    {
+      "email": "nadyrshin.2004@mail.ru",
+      "hashed_password": "$2b$12$1semOKs/wNLPpbPJXX8Xie0YpfeEvYOV6qs.fHRQh1ETtIUkLJq5."
+    },
+    {
+      "email": "test@test.com",
+      "hashed_password": "$2b$12$w/KkGuLiPMoroSph5ystD.hmD6yG0ybvPv7n7uxEJ2/ODeW606G/q"
+    },
+    {
+      "email": "new@mail.ru",
+      "hashed_password": "$2b$12$VN46Bc6ZLGWZcY77JI4BzuJC4/.C6Yq9Yq4a7P4Tj/3fgJkVqf2JC"
+    },
+    {
+
+      "email": "new@new.ru",
+      "hashed_password": "$2b$12$OhYWjH.T2Z9.DpQIz1X9N.ELbDtpiJLBvHlkn1lAuplQMb1yAwM5m"
+    },
+    {
+
+      "email": "new@mail.edu",
+      "hashed_password": "$2b$12$4VunofFokkygDxVqQ9QFCu3f4IjJ/vOSyD9pXW/KVg6zB9/3Sv9/y"
+    }
+]
