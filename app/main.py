@@ -2,7 +2,6 @@ import asyncio
 import time
 from contextlib import asynccontextmanager
 from datetime import date
-from token import EXCLAMATION
 from typing import Optional
 
 import sentry_sdk
