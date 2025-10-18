@@ -1,0 +1,131 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: получение кода с репозитория
+      uses: actions/checkout@v4
+
+    - name: установка python 3.11 
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: установка зависимостей
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: установка postgresql и redis 
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql postgresql-contrib redis-server
+        
+        # запуск 
+        sudo systemctl start postgresql
+        sudo systemctl enable postgresql
+        
+        # пароль postgres
+        sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+        
+        # создание тестовой базы данных
+        sudo -u postgres psql -c "CREATE DATABASE test_hotels;" || true
+        
+        # Проверить подключение к PostgreSQL
+        sudo -u postgres psql -d test_hotels -c "SELECT 1;" || echo "PostgreSQL готов"
+        
+        # Запустить Redis
+        sudo systemctl start redis-server
+        sudo systemctl enable redis-server
+        
+        # Проверить подключение к Redis
+        redis-cli ping || echo "Redis готов"
+
+    - name: настройка переменного окружения 
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DSN: ${{ secrets.DSN }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        SMTP_USER_FOR_MAIL: ${{ secrets.SMTP_USER_FOR_MAIL }}
+      run: |
+        echo "MODE=TEST" >> $GITHUB_ENV
+        echo "LOG_LEVEL=INFO" >> $GITHUB_ENV
+        echo "DB_HOST=localhost" >> $GITHUB_ENV
+        echo "DB_PORT=5432" >> $GITHUB_ENV
+        echo "DB_USER=postgres" >> $GITHUB_ENV
+        echo "DB_PASSWORD=postgres" >> $GITHUB_ENV
+        echo "DB_NAME=test_hotels" >> $GITHUB_ENV
+        echo "TEST_DB_HOST=localhost" >> $GITHUB_ENV
+        echo "TEST_DB_PORT=5432" >> $GITHUB_ENV
+        echo "TEST_DB_USER=postgres" >> $GITHUB_ENV
+        echo "TEST_DB_PASSWORD=postgres" >> $GITHUB_ENV
+        echo "TEST_DB_NAME=test_hotels" >> $GITHUB_ENV
+        echo "SECRET_KEY=$SECRET_KEY" >> $GITHUB_ENV
+        echo "DSN=$DSN" >> $GITHUB_ENV
+        echo "ALGORITHM=HS256" >> $GITHUB_ENV
+        echo "SMTP_HOST=smtp.gmail.com" >> $GITHUB_ENV
+        echo "SMTP_PORT=465" >> $GITHUB_ENV
+        echo "SMTP_USER=$SMTP_USER" >> $GITHUB_ENV
+        echo "SMTP_PASS=$SMTP_PASS" >> $GITHUB_ENV
+        echo "SMTP_USER_FOR_MAIL=$SMTP_USER_FOR_MAIL" >> $GITHUB_ENV
+        echo "REDIS_HOST=localhost" >> $GITHUB_ENV
+        echo "REDIS_PORT=6379" >> $GITHUB_ENV
+
+    - name: прогон тестов
+      run: |
+        echo "Запуск pytest"
+        pytest -v
+
+  build:
+    needs: test 
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Установить Docker
+      run: |
+        # Add Docker's official GPG key
+        sudo apt-get update
+        sudo apt-get install ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+        
+        # Add the repository to Apt sources
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        
+        # Install Docker
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        
+        # Verify installation
+        docker --version
+        docker compose version
+        - name: Собрать и протестировать Docker Compose
+      run: |
+        docker compose -f docker-compose.test.yml build
+        docker compose -f docker-compose.test.yml up -d
+        sleep 10
+        docker compose -f docker-compose.test.yml ps
+        sleep 20
+        docker compose -f docker-compose.test.yml ps
+        docker compose -f docker-compose.test.yml logs --tail=50
+        
+        FAILED_CONTAINERS=$(docker compose -f docker-compose.test.yml ps --filter "status=exited" --format "table {{.Name}}\t{{.Status}}" | grep -v "NAME" | wc -l)
+        if [ "$FAILED_CONTAINERS" -gt 0 ]; then
+          docker compose -f docker-compose.test.yml ps --filter "status=exited"
+          echo "Логи упавших контейнеров:"
+          docker compose -f docker-compose.test.yml logs --tail=100
+          exit 1
+        fi
+        
+        docker compose -f docker-compose.test.yml down
