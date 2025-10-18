@@ -1,0 +1,59 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: hotel_app_db
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    env_file:
+      - .env-test
+    ports:
+      - 5432:5432
+  redis:
+    image: redis:7
+    container_name: hotel_app_redis
+    env_file:
+      - .env-test
+  
+
+  hotel_app:
+    build:
+      context: .
+    container_name: hotel_app
+    env_file: 
+      - .env-test
+    depends_on:
+      - db
+      - redis
+    command: ["docker/app.sh"]
+    ports: 
+      - 7777:8000
+    volumes:
+      - ./app:/hotel_app/app  # ←
+  
+  celery: 
+    build:
+      context: . 
+    container_name: hotel_app_celery
+    depends_on: 
+      - redis
+      - hotel_app 
+    command: ["docker/celery.sh"]
+    env_file: 
+      - .env-test
+  
+  flower: 
+    build: 
+      context: . 
+    container_name: hotel_app_flower
+    depends_on: 
+      - redis
+      - hotel_app
+    command: ["docker/flower.sh"]
+    env_file: 
+      - .env-test
+    ports:
+      - 5555:5555  
+
+volumes:
+  postgresdata:

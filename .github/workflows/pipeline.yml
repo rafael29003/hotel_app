@@ -110,7 +110,8 @@ jobs:
         # Verify installation
         docker --version
         docker compose version
-        - name: Собрать и протестировать Docker Compose
+
+    - name: Собрать и протестировать Docker Compose
       run: |
         docker compose -f docker-compose.test.yml build
         docker compose -f docker-compose.test.yml up -d
