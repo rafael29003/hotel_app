@@ -17,8 +17,9 @@ from httpx import AsyncClient
     ],
 )
 async def test_add_booking(
-    auth_ac: AsyncClient, date_from, date_to, room_id, status_code
+    auth_ac: AsyncClient, date_from, date_to, room_id, status_code, mock_celery_task
 ):
+    """Тест создания бронирования с моком Celery задачи"""
     response = await auth_ac.post(
         "/bookings",
         params={
@@ -30,6 +31,10 @@ async def test_add_booking(
 
     assert response.status_code == status_code
 
+    if status_code == 200:
+        assert mock_celery_task.delay.called == True  
+    else:
+        assert mock_celery_task.delay.called == False
 
 async def test_get_and_delete(auth_ac: AsyncClient):
     response = await auth_ac.get("/bookings")  # Правильный URL

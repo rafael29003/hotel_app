@@ -4,6 +4,7 @@ os.environ["MODE"] = "TEST"
 
 import asyncio
 import json
+from unittest.mock import patch, MagicMock
 
 import pytest
 import pytest_asyncio
@@ -107,3 +108,9 @@ async def auth_ac():
             cookies={"booking_access_token": token},
         ) as auth_client:
             yield auth_client
+
+
+@pytest.fixture
+def mock_celery_task():
+    with patch('app.bookings.router.send_booking_confirmation_email') as mock_task:
+        yield mock_task
