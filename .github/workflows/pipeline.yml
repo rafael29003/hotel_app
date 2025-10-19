@@ -135,6 +135,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    steps:
     - name: Deploy on VPS
       env:
         VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -144,11 +145,9 @@ jobs:
       run: |
         echo "Деплой на VPS" 
         
-        # Установить sshpass для автоматического ввода пароля
         sudo apt-get update
         sudo apt-get install -y sshpass
         
-        # Выполнить все команды на VPS одной строкой
         sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "
           echo 'остановка контейнеров'
           cd $VPS_PATH
