@@ -41,8 +41,8 @@ services:
     command: ["docker/app.sh"]
     # ports: 
     #   - 7777:8000
-    volumes:
-      - ./app:/hotel_app/app  # ← Синхронизация кода для разработки
+    # volumes:
+    #  - ./app:/hotel_app/app  # ← Синхронизация кода для разработки
   
   celery: 
     build:

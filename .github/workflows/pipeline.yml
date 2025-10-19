@@ -154,7 +154,8 @@ jobs:
           docker compose down
 
           echo 'обновление кода'
-          git pull origin main
+          git fetch origin main
+          git reset --hard origin/main
             
           echo 'пересборка образа'
           docker compose build
