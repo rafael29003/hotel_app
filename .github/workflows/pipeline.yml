@@ -143,27 +143,26 @@ jobs:
         VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
         VPS_PATH: ${{ secrets.VPS_PATH }}
       run: |
-        echo "Деплой на VPS" 
+        echo "Деплой на VPS......................................'" 
         
         sudo apt-get update
         sudo apt-get install -y sshpass
         
         sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "
-          echo 'остановка контейнеров'
+          echo 'остановка контейнеров......................................''
           cd $VPS_PATH
           docker compose down
 
-          echo 'обновление кода'
-          git fetch origin main
-          git reset --hard origin/main
+          echo 'обновление кода......................................'
+          git pull origin main
             
-          echo 'пересборка образа'
+          echo 'пересборка образа......................................''
           docker compose build
             
-          echo 'запуск'
+          echo 'запуск......................................''
           docker compose up -d
             
-          echo 'проверка на ошибки'
+          echo 'проверка на ошибки......................................''
           docker compose ps
         "
         
