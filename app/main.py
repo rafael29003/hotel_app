@@ -23,7 +23,7 @@ from app.hotels.rooms.models import Rooms
 from app.hotels.rooms.router import router as rooms_router
 from app.hotels.router import router as hotels_router
 from app.logger import logger
-from app.pages.router import router as pages_router
+from app.deploy_router.router import router as test_deploy_router
 from app.users.models import Users
 from app.users.router import router as users_router
 
@@ -63,7 +63,7 @@ app.include_router(users_router)
 app.include_router(bookings_router)
 app.include_router(hotels_router)
 app.include_router(rooms_router)
-app.include_router(pages_router)
+app.include_router(test_deploy_router)
 
 
 @app.get("/")
